@@ -15,7 +15,15 @@ import json
 import sys
 from typing import List
 
-from .finder import SORT_KEYS, DealFilter, LeaseFinder
+from .finder import (
+    PRICE_SOURCES,
+    RESIDUAL_SOURCES,
+    SORT_KEYS,
+    DealFilter,
+    LeaseFinder,
+    build_price_source,
+    build_residual_source,
+)
 from .models import LeaseDeal
 
 
@@ -50,6 +58,22 @@ def build_parser() -> argparse.ArgumentParser:
         type=float,
         default=0.0,
         help="non-financed fees due at signing (doc, registration, ...)",
+    )
+    p.add_argument(
+        "--residuals",
+        choices=RESIDUAL_SOURCES,
+        default="estimated",
+        help="residual/money-factor source (default: estimated depreciation model)",
+    )
+    p.add_argument(
+        "--prices",
+        choices=PRICE_SOURCES,
+        default="estimated",
+        help="selling-price source (default: estimated from MSRP)",
+    )
+    p.add_argument(
+        "--marketcheck-key",
+        help="API key for --prices marketcheck (free tier at marketcheck.com/apis)",
     )
     p.add_argument("--json", action="store_true", help="emit JSON instead of a table")
     return p
@@ -104,7 +128,14 @@ def _print_table(deals: List[LeaseDeal]) -> None:
 def main(argv: List[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
-    finder = LeaseFinder(tax_rate=args.tax_rate, upfront_fees=args.upfront_fees)
+    finder = LeaseFinder(
+        residual_source=build_residual_source(args.residuals),
+        price_source=build_price_source(
+            args.prices, marketcheck_key=args.marketcheck_key
+        ),
+        tax_rate=args.tax_rate,
+        upfront_fees=args.upfront_fees,
+    )
     deal_filter = DealFilter(
         make=args.make,
         body_style=args.body_style,

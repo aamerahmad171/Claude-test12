@@ -18,13 +18,22 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))  # allow running as `python scripts/build_report.py`
 
-from leasefinder.finder import LeaseFinder  # noqa: E402
+from leasefinder.finder import (  # noqa: E402
+    LeaseFinder,
+    build_price_source,
+    build_residual_source,
+)
+
 OUT = REPO_ROOT / "docs" / "index.html"
+TOP_N = 40  # the model generates many (term x mileage) combos; show the best
 
 
 def _deal_rows() -> list[dict]:
-    finder = LeaseFinder()
-    deals = finder.find_best_deals(sort="deal_score")  # all deals, best first
+    finder = LeaseFinder(
+        residual_source=build_residual_source("estimated"),
+        price_source=build_price_source("estimated"),
+    )
+    deals = finder.find_best_deals(top=TOP_N, sort="deal_score")
     rows = []
     for d in deals:
         m = d.metrics
@@ -129,10 +138,11 @@ a{color:#7fb6ff;}
   <h1>🚗 Lease Deals Finder — Results</h1>
   <div class="sub">Ranked by combining residual values &amp; money factors (Leasehackr-style) with current selling prices (CarGurus-style). Click any column header to re-sort.</div>
   <div class="note">
-    <strong>Heads up:</strong> these figures come from the project's bundled <strong>sample dataset</strong>,
-    not live Leasehackr / CarGurus quotes (neither offers a public API). The lease math is exact;
-    swap in a licensed feed or a maintained data file to make the numbers live.
-    Generated <strong>__GENERATED__</strong>.
+    <strong>Heads up:</strong> residuals &amp; money factors here are <strong>modeled</strong> from
+    published depreciation patterns (term, segment, mileage), and prices are estimated from MSRP —
+    no Leasehackr / CarGurus feed (neither offers a public API). The lease math is exact; the inputs
+    are transparent estimates, not a specific manufacturer's program. Drop in a maintained data file
+    or a Marketcheck key for real prices. Generated <strong>__GENERATED__</strong>.
   </div>
 </header>
 <div class="wrap">

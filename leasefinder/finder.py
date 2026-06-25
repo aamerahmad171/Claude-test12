@@ -9,7 +9,35 @@ from .lease_math import compute_lease
 from .models import LeaseDeal, Vehicle
 from .scoring import compute_metrics
 from .sources.base import PriceSource, ResidualSource
+from .sources.estimated import EstimatedPriceSource, EstimatedResidualSource
 from .sources.sample import SamplePriceSource, SampleResidualSource
+
+# Named residual/price providers selectable from the CLI, web UI, and report.
+RESIDUAL_SOURCES = ("estimated", "sample")
+PRICE_SOURCES = ("estimated", "sample", "marketcheck")
+
+
+def build_residual_source(name: str) -> ResidualSource:
+    """Construct a residual source by name (see ``RESIDUAL_SOURCES``)."""
+    if name == "estimated":
+        return EstimatedResidualSource()
+    if name == "sample":
+        return SampleResidualSource()
+    raise ValueError(f"unknown residual source {name!r}; choose from {RESIDUAL_SOURCES}")
+
+
+def build_price_source(name: str, *, marketcheck_key: Optional[str] = None) -> PriceSource:
+    """Construct a price source by name (see ``PRICE_SOURCES``)."""
+    if name == "estimated":
+        return EstimatedPriceSource()
+    if name == "sample":
+        return SamplePriceSource()
+    if name == "marketcheck":
+        from .sources.marketcheck import MarketcheckPriceSource
+
+        return MarketcheckPriceSource(api_key=marketcheck_key)
+    raise ValueError(f"unknown price source {name!r}; choose from {PRICE_SOURCES}")
+
 
 # How each sort key orders deals. ``True`` means "smaller is better".
 SORT_KEYS = {

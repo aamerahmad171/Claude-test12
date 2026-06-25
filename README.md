@@ -18,16 +18,29 @@ ranks them using transparent, well-known lease metrics (the **1% rule**, the
 
 Neither Leasehackr nor CarGurus offers a public API, and both use anti-bot
 protection. Scraping them programmatically is unreliable and generally against
-their Terms of Service. So this project is built around a **pluggable data-source
-interface** rather than a brittle scraper:
+their Terms of Service. (Residuals & money factors originate from ALG/J.D. Power
+and manufacturers' private dealer bulletins — there is no free or self-serve
+public feed for them anywhere.) So this project is built around a **pluggable
+data-source interface** with several providers:
 
-- **`SampleResidualSource` / `SamplePriceSource`** — realistic, hand-seeded data
-  in [`data/`](data/) so the whole app runs **end-to-end offline**, today, with
-  no API keys. This is the default.
-- **`leasehackr.py` / `cargurus.py`** — documented adapter stubs that show
-  *exactly* where to plug in real data: a licensed data feed, a manually exported
-  CSV, a dealer's lease program sheet, or your own compliant fetcher. They
-  implement the same interface, so the rest of the app doesn't change.
+- **`EstimatedResidualSource` / `EstimatedPriceSource`** — *the default.* Instead
+  of needing Leasehackr's proprietary numbers, these **model** the residual %,
+  money factor, and price from published depreciation patterns (term, segment,
+  mileage) and MSRP. Transparent estimates grounded in real depreciation
+  behavior — not a specific manufacturer's program, but defensible and 100%
+  offline. See [`residual_model.py`](leasefinder/residual_model.py).
+- **`MarketcheckPriceSource`** — a **real** live-price adapter (stdlib HTTP, no
+  scraping) backed by the [Marketcheck API](https://www.marketcheck.com/apis),
+  which has a free tier. Activate it with a key: `--prices marketcheck
+  --marketcheck-key YOUR_KEY`.
+- **`SampleResidualSource` / `SamplePriceSource`** — hand-seeded data in
+  [`data/`](data/) for a fixed, reproducible demo (`--residuals sample`).
+- **`leasehackr.py` / `cargurus.py`** — documented adapter stubs showing where to
+  plug in a maintained data file or licensed feed (the way to get *exact*
+  program numbers, e.g. copied from a real dealer quote).
+
+All providers implement the same interface, so the math, scoring, CLI, web UI,
+and report work unchanged regardless of which you pick.
 
 The **lease math itself is exact** — it's the same depreciation + rent-charge
 formula the Leasehackr calculator uses, and it's covered by tests against
@@ -44,11 +57,17 @@ python3 -m venv .venv && source .venv/bin/activate
 # install (web UI needs Flask; the core + CLI have no dependencies)
 pip install -r requirements.txt
 
-# rank the best deals from the bundled sample data
+# rank the best deals (default: modeled residuals + estimated prices)
 python -m leasefinder.cli --top 10
 
 # only SUVs, 36-month terms, payment under $500/mo, sorted by the 1% rule
 python -m leasefinder.cli --body SUV --term 36 --max-payment 500 --sort one_percent
+
+# use real live prices from Marketcheck (free-tier key)
+python -m leasefinder.cli --prices marketcheck --marketcheck-key YOUR_KEY
+
+# use the fixed hand-seeded sample dataset instead of the model
+python -m leasefinder.cli --residuals sample --prices sample
 
 # launch the web UI at http://localhost:5000
 python -m leasefinder.web.app
@@ -120,13 +139,16 @@ compared on:
 ```
 leasefinder/
   lease_math.py      # the core lease formula (pure, fully tested)
+  residual_model.py  # depreciation-based residual/money-factor estimator
   models.py          # Vehicle, LeaseProgram, PriceQuote, LeaseDeal dataclasses
   scoring.py         # 1% rule, effective cost, composite deal score
   finder.py          # orchestration: sources -> deals -> ranked results
   cli.py             # command-line interface
   sources/
     base.py          # ResidualSource / PriceSource interfaces
-    sample.py        # offline sample providers (default)
+    estimated.py     # modeled residuals + estimated prices (default)
+    marketcheck.py   # real live-price adapter (free-tier API key)
+    sample.py        # fixed hand-seeded providers
     leasehackr.py    # residual + money-factor adapter stub (documented)
     cargurus.py      # selling-price adapter stub (documented)
   web/

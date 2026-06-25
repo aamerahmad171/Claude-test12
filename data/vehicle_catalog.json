@@ -1,0 +1,23 @@
+{
+  "_comment": "Vehicle catalog (make/model/year/body/MSRP) — the public-ish part of the data. The EstimatedResidualSource generates lease programs for these via the depreciation model in leasefinder/residual_model.py. MSRPs are representative.",
+  "vehicles": [
+    {"make": "Honda", "model": "Civic", "year": 2025, "trim": "Sport", "body_style": "Sedan", "msrp": 27450},
+    {"make": "Honda", "model": "Accord", "year": 2025, "trim": "EX", "body_style": "Sedan", "msrp": 31300},
+    {"make": "Honda", "model": "CR-V", "year": 2025, "trim": "EX", "body_style": "SUV", "msrp": 33950},
+    {"make": "Toyota", "model": "Corolla", "year": 2025, "trim": "LE", "body_style": "Sedan", "msrp": 23460},
+    {"make": "Toyota", "model": "Camry", "year": 2025, "trim": "SE", "body_style": "Sedan", "msrp": 29900},
+    {"make": "Toyota", "model": "RAV4", "year": 2025, "trim": "XLE", "body_style": "SUV", "msrp": 34230},
+    {"make": "Toyota", "model": "Tacoma", "year": 2025, "trim": "SR5", "body_style": "Truck", "msrp": 38200},
+    {"make": "Mazda", "model": "CX-5", "year": 2025, "trim": "Select", "body_style": "SUV", "msrp": 31900},
+    {"make": "Subaru", "model": "Outback", "year": 2025, "trim": "Premium", "body_style": "SUV", "msrp": 32400},
+    {"make": "Hyundai", "model": "Tucson", "year": 2025, "trim": "SEL", "body_style": "SUV", "msrp": 31250},
+    {"make": "Hyundai", "model": "Elantra", "year": 2025, "trim": "SEL", "body_style": "Sedan", "msrp": 24500},
+    {"make": "Kia", "model": "Telluride", "year": 2025, "trim": "LX", "body_style": "SUV", "msrp": 38800},
+    {"make": "Ford", "model": "F-150", "year": 2025, "trim": "XLT", "body_style": "Truck", "msrp": 48200},
+    {"make": "Chevrolet", "model": "Equinox EV", "year": 2025, "trim": "LT", "body_style": "EV", "msrp": 43295},
+    {"make": "Tesla", "model": "Model 3", "year": 2025, "trim": "RWD", "body_style": "EV", "msrp": 42990},
+    {"make": "BMW", "model": "330i", "year": 2025, "trim": "xDrive", "body_style": "Luxury", "msrp": 46900},
+    {"make": "Honda", "model": "Odyssey", "year": 2025, "trim": "EX-L", "body_style": "Minivan", "msrp": 42500},
+    {"make": "Volkswagen", "model": "Golf GTI", "year": 2025, "trim": "S", "body_style": "Hatchback", "msrp": 32400}
+  ]
+}

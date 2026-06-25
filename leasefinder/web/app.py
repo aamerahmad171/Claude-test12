@@ -9,7 +9,13 @@ from __future__ import annotations
 
 from flask import Flask, jsonify, render_template, request
 
-from ..finder import SORT_KEYS, DealFilter, LeaseFinder
+from ..finder import (
+    SORT_KEYS,
+    DealFilter,
+    LeaseFinder,
+    build_price_source,
+    build_residual_source,
+)
 from ..models import LeaseDeal
 
 
@@ -19,7 +25,16 @@ def create_app() -> Flask:
     def _query_deals() -> list[LeaseDeal]:
         args = request.args
         tax_rate = _as_float(args.get("tax_rate"), 0.0)
-        finder = LeaseFinder(tax_rate=tax_rate)
+        residuals = args.get("residuals", "estimated")
+        finder = LeaseFinder(
+            residual_source=build_residual_source(
+                residuals if residuals in ("estimated", "sample") else "estimated"
+            ),
+            price_source=build_price_source(
+                "sample" if residuals == "sample" else "estimated"
+            ),
+            tax_rate=tax_rate,
+        )
         deal_filter = DealFilter(
             make=args.get("make") or None,
             body_style=args.get("body") or None,
