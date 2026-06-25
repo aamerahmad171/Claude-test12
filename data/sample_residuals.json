@@ -1,0 +1,120 @@
+{
+  "_comment": "Illustrative, hand-seeded lease-program data (residual % + money factor). NOT live numbers. Replace via a compliant Leasehackr-derived source (see leasefinder/sources/leasehackr.py).",
+  "vehicles": [
+    {
+      "make": "Honda",
+      "model": "Civic",
+      "year": 2025,
+      "trim": "Sport",
+      "body_style": "Sedan",
+      "msrp": 27450,
+      "programs": [
+        {"term": 36, "annual_mileage": 10000, "residual_percent": 0.62, "money_factor": 0.00150, "incentives": 500, "acquisition_fee": 595},
+        {"term": 36, "annual_mileage": 12000, "residual_percent": 0.60, "money_factor": 0.00150, "incentives": 500, "acquisition_fee": 595}
+      ]
+    },
+    {
+      "make": "Honda",
+      "model": "CR-V",
+      "year": 2025,
+      "trim": "EX",
+      "body_style": "SUV",
+      "msrp": 33950,
+      "programs": [
+        {"term": 36, "annual_mileage": 12000, "residual_percent": 0.61, "money_factor": 0.00160, "incentives": 750, "acquisition_fee": 595},
+        {"term": 39, "annual_mileage": 12000, "residual_percent": 0.58, "money_factor": 0.00160, "incentives": 750, "acquisition_fee": 595}
+      ]
+    },
+    {
+      "make": "Toyota",
+      "model": "RAV4",
+      "year": 2025,
+      "trim": "XLE",
+      "body_style": "SUV",
+      "msrp": 34230,
+      "programs": [
+        {"term": 36, "annual_mileage": 12000, "residual_percent": 0.63, "money_factor": 0.00170, "incentives": 500, "acquisition_fee": 650},
+        {"term": 48, "annual_mileage": 12000, "residual_percent": 0.52, "money_factor": 0.00170, "incentives": 500, "acquisition_fee": 650}
+      ]
+    },
+    {
+      "make": "Toyota",
+      "model": "Camry",
+      "year": 2025,
+      "trim": "SE",
+      "body_style": "Sedan",
+      "msrp": 29900,
+      "programs": [
+        {"term": 36, "annual_mileage": 12000, "residual_percent": 0.60, "money_factor": 0.00120, "incentives": 1000, "acquisition_fee": 650}
+      ]
+    },
+    {
+      "make": "Tesla",
+      "model": "Model 3",
+      "year": 2025,
+      "trim": "RWD",
+      "body_style": "EV",
+      "msrp": 42990,
+      "programs": [
+        {"term": 36, "annual_mileage": 10000, "residual_percent": 0.55, "money_factor": 0.00200, "incentives": 0, "acquisition_fee": 695}
+      ]
+    },
+    {
+      "make": "BMW",
+      "model": "330i",
+      "year": 2025,
+      "trim": "xDrive",
+      "body_style": "Sedan",
+      "msrp": 46900,
+      "programs": [
+        {"term": 36, "annual_mileage": 10000, "residual_percent": 0.59, "money_factor": 0.00210, "incentives": 1500, "acquisition_fee": 925},
+        {"term": 36, "annual_mileage": 12000, "residual_percent": 0.57, "money_factor": 0.00210, "incentives": 1500, "acquisition_fee": 925}
+      ]
+    },
+    {
+      "make": "Hyundai",
+      "model": "Tucson",
+      "year": 2025,
+      "trim": "SEL",
+      "body_style": "SUV",
+      "msrp": 31250,
+      "programs": [
+        {"term": 36, "annual_mileage": 12000, "residual_percent": 0.58, "money_factor": 0.00140, "incentives": 1250, "acquisition_fee": 650}
+      ]
+    },
+    {
+      "make": "Chevrolet",
+      "model": "Equinox EV",
+      "year": 2025,
+      "trim": "LT",
+      "body_style": "EV",
+      "msrp": 43295,
+      "programs": [
+        {"term": 24, "annual_mileage": 10000, "residual_percent": 0.62, "money_factor": 0.00090, "incentives": 7500, "acquisition_fee": 695},
+        {"term": 36, "annual_mileage": 10000, "residual_percent": 0.51, "money_factor": 0.00090, "incentives": 7500, "acquisition_fee": 695}
+      ]
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "year": 2025,
+      "trim": "XLT",
+      "body_style": "Truck",
+      "msrp": 48200,
+      "programs": [
+        {"term": 36, "annual_mileage": 12000, "residual_percent": 0.60, "money_factor": 0.00180, "incentives": 1000, "acquisition_fee": 645}
+      ]
+    },
+    {
+      "make": "Subaru",
+      "model": "Outback",
+      "year": 2025,
+      "trim": "Premium",
+      "body_style": "SUV",
+      "msrp": 32400,
+      "programs": [
+        {"term": 36, "annual_mileage": 12000, "residual_percent": 0.61, "money_factor": 0.00130, "incentives": 500, "acquisition_fee": 695}
+      ]
+    }
+  ]
+}

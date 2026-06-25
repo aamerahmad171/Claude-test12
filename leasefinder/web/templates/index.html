@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lease Deals Finder</title>
+  <style>
+    :root { --bg:#0f1115; --card:#181b22; --line:#262b35; --txt:#e6e9ef; --muted:#8b93a3; --accent:#4ad29550; --good:#4ad295; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--txt); font:15px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+    header { padding:28px 24px 8px; }
+    h1 { margin:0; font-size:24px; }
+    .sub { color:var(--muted); margin-top:4px; }
+    .note { color:var(--muted); font-size:12.5px; max-width:760px; margin-top:8px; }
+    form { display:flex; flex-wrap:wrap; gap:12px; padding:16px 24px; align-items:end; }
+    .field { display:flex; flex-direction:column; gap:4px; }
+    label { font-size:12px; color:var(--muted); }
+    input, select { background:var(--card); border:1px solid var(--line); color:var(--txt); padding:7px 9px; border-radius:7px; font-size:14px; }
+    button { background:var(--good); color:#06241a; border:0; padding:8px 16px; border-radius:7px; font-weight:600; cursor:pointer; }
+    .wrap { padding:8px 24px 40px; }
+    table { width:100%; border-collapse:collapse; background:var(--card); border-radius:10px; overflow:hidden; }
+    th, td { text-align:right; padding:10px 12px; border-bottom:1px solid var(--line); white-space:nowrap; }
+    th:first-child, td:first-child, th.l, td.l { text-align:left; }
+    th { color:var(--muted); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.03em; }
+    tbody tr:hover { background:#1e2230; }
+    .score { font-weight:700; color:var(--good); }
+    .pill { font-size:11px; color:var(--muted); border:1px solid var(--line); padding:1px 7px; border-radius:999px; }
+    .good1 { color:var(--good); font-weight:600; }
+    .empty { color:var(--muted); padding:24px; }
+    a { color:#7fb6ff; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🚗 Lease Deals Finder</h1>
+    <div class="sub">Ranks lease deals from residual/money-factor data (Leasehackr-style) and current prices (CarGurus-style).</div>
+    <div class="note">
+      Running on bundled <strong>sample data</strong> — illustrative, not live quotes.
+      <code>1%</code> = base payment as % of MSRP (≤1.0% is strong). <code>Eff/mo</code> folds in all due-at-signing cash.
+      <code>Score</code> is a transparent 0–100 composite (higher is better), not the proprietary Leasehackr Score.
+    </div>
+  </header>
+
+  <form method="get" action="/">
+    <div class="field">
+      <label>Make</label>
+      <input name="make" value="{{ args.get('make','') }}" placeholder="any" />
+    </div>
+    <div class="field">
+      <label>Body</label>
+      <select name="body">
+        {% set b = args.get('body','') %}
+        <option value="" {{ 'selected' if b=='' }}>any</option>
+        {% for opt in ['Sedan','SUV','Truck','EV'] %}
+          <option value="{{opt}}" {{ 'selected' if b==opt }}>{{opt}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label>Term (mo)</label>
+      <input name="term" value="{{ args.get('term','') }}" placeholder="any" size="6" />
+    </div>
+    <div class="field">
+      <label>Max payment</label>
+      <input name="max_payment" value="{{ args.get('max_payment','') }}" placeholder="any" size="7" />
+    </div>
+    <div class="field">
+      <label>Tax rate</label>
+      <input name="tax_rate" value="{{ args.get('tax_rate','') }}" placeholder="0.0" size="6" />
+    </div>
+    <div class="field">
+      <label>Sort by</label>
+      <select name="sort">
+        {% set s = args.get('sort','deal_score') %}
+        {% for key in sort_keys %}
+          <option value="{{key}}" {{ 'selected' if s==key }}>{{key}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit">Find deals</button>
+  </form>
+
+  <div class="wrap">
+    {% if deals %}
+    <table>
+      <thead>
+        <tr>
+          <th class="l">#</th>
+          <th class="l">Vehicle</th>
+          <th class="l">Body</th>
+          <th>MSRP</th>
+          <th>Price</th>
+          <th>Pay/mo</th>
+          <th>Eff/mo</th>
+          <th>1%</th>
+          <th>Due@sign</th>
+          <th>Term</th>
+          <th>Mi/yr</th>
+          <th>APR</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in deals %}
+        <tr>
+          <td class="l">{{ loop.index }}</td>
+          <td class="l">{{ d.vehicle }}<br><span class="pill">{{ d.price.dealer }}</span></td>
+          <td class="l">{{ d.vehicle.body_style }}</td>
+          <td>${{ "{:,.0f}".format(d.vehicle.msrp) }}</td>
+          <td>${{ "{:,.0f}".format(d.price.selling_price) }}</td>
+          <td>${{ "{:,.0f}".format(d.metrics.base_payment) }}</td>
+          <td>${{ "{:,.0f}".format(d.metrics.effective_monthly) }}</td>
+          <td class="{{ 'good1' if d.metrics.one_percent <= 1.0 else '' }}">{{ "%.2f"|format(d.metrics.one_percent) }}%</td>
+          <td>${{ "{:,.0f}".format(d.metrics.due_at_signing) }}</td>
+          <td>{{ d.program.term }}</td>
+          <td>{{ (d.program.annual_mileage // 1000) }}k</td>
+          <td>{{ "%.1f"|format(d.metrics.apr) }}%</td>
+          <td class="score">{{ "%.0f"|format(d.metrics.deal_score) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">No deals matched your filters.</div>
+    {% endif %}
+  </div>
+</body>
+</html>
