@@ -1,0 +1,6 @@
+# Core library + CLI have no runtime dependencies (standard library only).
+# The web UI needs Flask:
+Flask>=3.0
+
+# For tests:
+#   pip install pytest
