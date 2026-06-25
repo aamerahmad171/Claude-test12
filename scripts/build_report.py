@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import datetime as _dt
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -28,10 +29,23 @@ OUT = REPO_ROOT / "docs" / "index.html"
 NOJS_ROWS = 40  # how many to pre-render for the no-JavaScript fallback
 
 
-def _deal_rows() -> list[dict]:
+def _price_source():
+    """Use real Marketcheck inventory when a key is configured, else modeled.
+
+    Set the ``MARKETCHECK_KEY`` env var (a repo secret in CI) to populate real
+    prices and VINs; without it the report falls back to estimated prices so
+    local and CI builds never require a key.
+    """
+    key = os.environ.get("MARKETCHECK_KEY", "").strip()
+    if key:
+        return build_price_source("marketcheck", marketcheck_key=key), True
+    return build_price_source("estimated"), False
+
+
+def _deal_rows(price_source) -> list[dict]:
     finder = LeaseFinder(
         residual_source=build_residual_source("estimated"),
-        price_source=build_price_source("estimated"),
+        price_source=price_source,
     )
     deals = finder.find_best_deals(sort="deal_score")  # all deals, best first
     rows = []
@@ -89,13 +103,38 @@ def _rows_html(rows: list[dict]) -> str:
     return "\n".join(out)
 
 
+_NOTE_MODELED = (
+    "residuals &amp; money factors are <strong>modeled</strong> from published depreciation "
+    "patterns (term, segment, mileage), and prices are estimated from MSRP. The lease math is "
+    "exact, but the inputs are transparent estimates, not a specific manufacturer's program. "
+    "<strong>VIN</strong> shows a dash (—) because these are modeled <em>archetypes</em> "
+    "(a &quot;2025 Silverado LT&quot;, not a specific car) — add a Marketcheck key "
+    "(repo secret <code>MARKETCHECK_KEY</code>) to pull real listings with real VINs."
+)
+_NOTE_REAL = (
+    "prices and <strong>VINs</strong> are <strong>real listings</strong> from the Marketcheck "
+    "API (one specific car per row); residuals &amp; money factors are still <strong>modeled</strong> "
+    "from published depreciation patterns. The lease math is exact."
+)
+
+
 def build_html() -> str:
-    rows = _deal_rows()
+    price_source, real = _price_source()
+    rows = _deal_rows(price_source)
+    if real and not rows:
+        # Key set but no listings came back (bad key / all requests failed) —
+        # never publish an empty page; fall back to modeled prices.
+        print("  [marketcheck] no listings returned; falling back to modeled prices",
+              file=sys.stderr)
+        rows = _deal_rows(build_price_source("estimated"))
+        real = False
+    note = _NOTE_REAL if real else _NOTE_MODELED
     generated = _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     return (
         _TEMPLATE
         .replace("/*DATA*/", json.dumps(rows))
         .replace("<!--ROWS-->", _rows_html(rows[:NOJS_ROWS]))
+        .replace("__DATA_NOTE__", note)
         .replace("__GENERATED__", generated)
     )
 
@@ -149,14 +188,7 @@ a{color:#7fb6ff;}
   <h1>🚗 Lease Deals Finder — Results</h1>
   <div class="sub">Ranked by combining residual values &amp; money factors (Leasehackr-style) with current selling prices (CarGurus-style). Use the filters to narrow by make (e.g. <strong>GM only</strong>) and term, and click any column header to re-sort.</div>
   <div class="note">
-    <strong>Heads up:</strong> residuals &amp; money factors here are <strong>modeled</strong> from
-    published depreciation patterns (term, segment, mileage), and prices are estimated from MSRP —
-    no Leasehackr / CarGurus feed (neither offers a public API). The lease math is exact; the inputs
-    are transparent estimates, not a specific manufacturer's program. Drop in a maintained data file
-    or a Marketcheck key for real prices. <strong>VIN</strong> shows a dash (—) here because these are
-    modeled <em>archetypes</em> (a "2025 Silverado LT", not a specific car) — a VIN identifies one
-    physical vehicle, so it only appears when the list is fed by real inventory (Marketcheck or a
-    maintained quote file). Generated <strong>__GENERATED__</strong>.
+    <strong>Heads up:</strong> __DATA_NOTE__ Generated <strong>__GENERATED__</strong>.
   </div>
 </header>
 <div class="wrap">

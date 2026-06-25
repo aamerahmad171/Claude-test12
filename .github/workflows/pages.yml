@@ -32,6 +32,10 @@ jobs:
         run: pip install -r requirements.txt
       - name: Generate report
         run: python scripts/build_report.py
+        env:
+          # Optional: add a repo secret MARKETCHECK_KEY to publish real listings
+          # + VINs. Without it the report falls back to modeled prices.
+          MARKETCHECK_KEY: ${{ secrets.MARKETCHECK_KEY }}
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

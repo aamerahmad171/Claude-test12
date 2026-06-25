@@ -17,6 +17,7 @@ works anywhere with internet. Without a key it raises a clear error.
 from __future__ import annotations
 
 import json
+import sys
 import urllib.parse
 import urllib.request
 from typing import List, Optional
@@ -49,6 +50,7 @@ class MarketcheckPriceSource(PriceSource):
         rows: int = 10,
         new_only: bool = True,
         timeout: float = 15.0,
+        quiet: bool = False,
     ):
         if not api_key:
             raise ValueError(
@@ -59,6 +61,7 @@ class MarketcheckPriceSource(PriceSource):
         self._rows = rows
         self._new_only = new_only
         self._timeout = timeout
+        self._quiet = quiet
 
     def prices_for(self, vehicle: Vehicle) -> List[PriceQuote]:
         params = {
@@ -75,8 +78,14 @@ class MarketcheckPriceSource(PriceSource):
 
         url = f"{API_URL}?{urllib.parse.urlencode(params)}"
         req = urllib.request.Request(url, headers={"Accept": "application/json"})
-        with urllib.request.urlopen(req, timeout=self._timeout) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
+        try:
+            with urllib.request.urlopen(req, timeout=self._timeout) as resp:
+                payload = json.loads(resp.read().decode("utf-8"))
+        except Exception as exc:  # noqa: BLE001 - one car's failure must not kill a build
+            if not self._quiet:
+                msg = str(exc).replace(self._api_key, "***")  # never log the key
+                print(f"  [marketcheck] {vehicle.vehicle_id}: {msg}", file=sys.stderr)
+            return []
 
         quotes: List[PriceQuote] = []
         for listing in payload.get("listings", []):

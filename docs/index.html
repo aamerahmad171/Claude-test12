@@ -40,14 +40,7 @@ a{color:#7fb6ff;}
   <h1>🚗 Lease Deals Finder — Results</h1>
   <div class="sub">Ranked by combining residual values &amp; money factors (Leasehackr-style) with current selling prices (CarGurus-style). Use the filters to narrow by make (e.g. <strong>GM only</strong>) and term, and click any column header to re-sort.</div>
   <div class="note">
-    <strong>Heads up:</strong> residuals &amp; money factors here are <strong>modeled</strong> from
-    published depreciation patterns (term, segment, mileage), and prices are estimated from MSRP —
-    no Leasehackr / CarGurus feed (neither offers a public API). The lease math is exact; the inputs
-    are transparent estimates, not a specific manufacturer's program. Drop in a maintained data file
-    or a Marketcheck key for real prices. <strong>VIN</strong> shows a dash (—) here because these are
-    modeled <em>archetypes</em> (a "2025 Silverado LT", not a specific car) — a VIN identifies one
-    physical vehicle, so it only appears when the list is fed by real inventory (Marketcheck or a
-    maintained quote file). Generated <strong>2026-06-25 03:20 UTC</strong>.
+    <strong>Heads up:</strong> residuals &amp; money factors are <strong>modeled</strong> from published depreciation patterns (term, segment, mileage), and prices are estimated from MSRP. The lease math is exact, but the inputs are transparent estimates, not a specific manufacturer's program. <strong>VIN</strong> shows a dash (—) because these are modeled <em>archetypes</em> (a &quot;2025 Silverado LT&quot;, not a specific car) — add a Marketcheck key (repo secret <code>MARKETCHECK_KEY</code>) to pull real listings with real VINs. Generated <strong>2026-06-25 03:24 UTC</strong>.
   </div>
 </header>
 <div class="wrap">
