@@ -18,6 +18,22 @@
     {"make": "Tesla", "model": "Model 3", "year": 2025, "trim": "RWD", "body_style": "EV", "msrp": 42990},
     {"make": "BMW", "model": "330i", "year": 2025, "trim": "xDrive", "body_style": "Luxury", "msrp": 46900},
     {"make": "Honda", "model": "Odyssey", "year": 2025, "trim": "EX-L", "body_style": "Minivan", "msrp": 42500},
-    {"make": "Volkswagen", "model": "Golf GTI", "year": 2025, "trim": "S", "body_style": "Hatchback", "msrp": 32400}
+    {"make": "Volkswagen", "model": "Golf GTI", "year": 2025, "trim": "S", "body_style": "Hatchback", "msrp": 32400},
+
+    {"make": "Chevrolet", "model": "Silverado 1500", "year": 2025, "trim": "LT", "body_style": "Truck", "msrp": 47900},
+    {"make": "Chevrolet", "model": "Equinox", "year": 2025, "trim": "LT", "body_style": "SUV", "msrp": 30100},
+    {"make": "Chevrolet", "model": "Blazer", "year": 2025, "trim": "2LT", "body_style": "SUV", "msrp": 37700},
+    {"make": "Chevrolet", "model": "Malibu", "year": 2025, "trim": "LT", "body_style": "Sedan", "msrp": 27300},
+    {"make": "Chevrolet", "model": "Trax", "year": 2025, "trim": "LT", "body_style": "SUV", "msrp": 23100},
+    {"make": "GMC", "model": "Sierra 1500", "year": 2025, "trim": "Elevation", "body_style": "Truck", "msrp": 52600},
+    {"make": "GMC", "model": "Terrain", "year": 2025, "trim": "SLE", "body_style": "SUV", "msrp": 31200},
+    {"make": "GMC", "model": "Acadia", "year": 2025, "trim": "Elevation", "body_style": "SUV", "msrp": 43500},
+    {"make": "Buick", "model": "Encore GX", "year": 2025, "trim": "Preferred", "body_style": "SUV", "msrp": 27000},
+    {"make": "Buick", "model": "Envision", "year": 2025, "trim": "Preferred", "body_style": "SUV", "msrp": 36500},
+    {"make": "Buick", "model": "Enclave", "year": 2025, "trim": "Preferred", "body_style": "SUV", "msrp": 45800},
+    {"make": "Cadillac", "model": "CT5", "year": 2025, "trim": "Luxury", "body_style": "Luxury", "msrp": 45000},
+    {"make": "Cadillac", "model": "XT5", "year": 2025, "trim": "Luxury", "body_style": "SUV", "msrp": 47800},
+    {"make": "Cadillac", "model": "Escalade", "year": 2025, "trim": "Luxury", "body_style": "SUV", "msrp": 89000},
+    {"make": "Cadillac", "model": "Lyriq", "year": 2025, "trim": "Tech", "body_style": "EV", "msrp": 59000}
   ]
 }

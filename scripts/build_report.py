@@ -25,7 +25,7 @@ from leasefinder.finder import (  # noqa: E402
 )
 
 OUT = REPO_ROOT / "docs" / "index.html"
-TOP_N = 40  # the model generates many (term x mileage) combos; show the best
+NOJS_ROWS = 40  # how many to pre-render for the no-JavaScript fallback
 
 
 def _deal_rows() -> list[dict]:
@@ -33,13 +33,14 @@ def _deal_rows() -> list[dict]:
         residual_source=build_residual_source("estimated"),
         price_source=build_price_source("estimated"),
     )
-    deals = finder.find_best_deals(top=TOP_N, sort="deal_score")
+    deals = finder.find_best_deals(sort="deal_score")  # all deals, best first
     rows = []
     for d in deals:
         m = d.metrics
         rows.append(
             {
                 "vehicle": d.vehicle.vehicle_id,
+                "make": d.vehicle.make,
                 "body": d.vehicle.body_style,
                 "dealer": d.price.dealer,
                 "msrp": d.vehicle.msrp,
@@ -92,7 +93,7 @@ def build_html() -> str:
     return (
         _TEMPLATE
         .replace("/*DATA*/", json.dumps(rows))
-        .replace("<!--ROWS-->", _rows_html(rows))
+        .replace("<!--ROWS-->", _rows_html(rows[:NOJS_ROWS]))
         .replace("__GENERATED__", generated)
     )
 
@@ -129,6 +130,13 @@ tbody tr:hover{background:#1e2230;}
 .pill{font-size:11px;color:var(--muted);border:1px solid var(--line);padding:1px 7px;border-radius:999px;}
 .good1{color:var(--good);font-weight:600;}
 .rank{color:var(--muted);}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:14px;}
+.controls .lbl{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.03em;margin-left:6px;}
+.controls .lbl:first-child{margin-left:0;}
+button.f{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:13px;cursor:pointer;}
+button.f:hover{border-color:#3a4150;}
+button.f.active{background:#2b3a55;border-color:#7fb6ff;color:#fff;font-weight:600;}
+.count{color:var(--muted);font-size:12.5px;margin-left:auto;}
 footer{color:var(--muted);font-size:12px;max-width:1100px;margin:0 auto;padding:0 24px 40px;}
 a{color:#7fb6ff;}
 </style>
@@ -136,7 +144,7 @@ a{color:#7fb6ff;}
 <body>
 <header>
   <h1>🚗 Lease Deals Finder — Results</h1>
-  <div class="sub">Ranked by combining residual values &amp; money factors (Leasehackr-style) with current selling prices (CarGurus-style). Click any column header to re-sort.</div>
+  <div class="sub">Ranked by combining residual values &amp; money factors (Leasehackr-style) with current selling prices (CarGurus-style). Use the filters to narrow by make (e.g. <strong>GM only</strong>) and term, and click any column header to re-sort.</div>
   <div class="note">
     <strong>Heads up:</strong> residuals &amp; money factors here are <strong>modeled</strong> from
     published depreciation patterns (term, segment, mileage), and prices are estimated from MSRP —
@@ -146,6 +154,17 @@ a{color:#7fb6ff;}
   </div>
 </header>
 <div class="wrap">
+  <div class="controls">
+    <span class="lbl">Make</span>
+    <button class="f" data-make="all">All makes</button>
+    <button class="f" data-make="gm">GM only</button>
+    <span class="lbl">Term</span>
+    <button class="f" data-term="all">All</button>
+    <button class="f" data-term="24">24 mo</button>
+    <button class="f" data-term="36">36 mo</button>
+    <button class="f" data-term="48">48 mo</button>
+    <span class="count" id="count"></span>
+  </div>
   <table id="t">
     <thead>
       <tr>
@@ -174,14 +193,24 @@ a{color:#7fb6ff;}
 <script>
 const DATA = /*DATA*/;
 const money = n => "$" + Math.round(n).toLocaleString();
+const GM_MAKES = new Set(["Chevrolet","Cadillac","Buick","GMC"]);
 let sortKey = "score", asc = false;
+let makeFilter = "all", termFilter = "24";  // default to 24-month terms
+function passes(r){
+  if(makeFilter==="gm" && !GM_MAKES.has(r.make)) return false;
+  if(termFilter!=="all" && String(r.term)!==termFilter) return false;
+  return true;
+}
 function render(){
-  const rows = [...DATA].sort((a,b)=>{
+  const rows = DATA.filter(passes).sort((a,b)=>{
     const x=a[sortKey], y=b[sortKey];
     const c = (typeof x==="number") ? x-y : String(x).localeCompare(String(y));
     return asc ? c : -c;
   });
+  const cnt = document.getElementById("count");
+  if(cnt) cnt.textContent = `${rows.length} of ${DATA.length} deals`;
   const tb = document.getElementById("b");
+  if(!rows.length){ tb.innerHTML = '<tr><td class="l" colspan="13">No deals match these filters.</td></tr>'; return; }
   tb.innerHTML = rows.map((r,i)=>`
     <tr>
       <td class="l rank">${i+1}</td>
@@ -207,6 +236,17 @@ document.querySelectorAll("th[data-k]").forEach(th=>{
     render();
   });
 });
+function syncActive(){
+  document.querySelectorAll("button.f[data-make]").forEach(b=>
+    b.classList.toggle("active", b.dataset.make===makeFilter));
+  document.querySelectorAll("button.f[data-term]").forEach(b=>
+    b.classList.toggle("active", b.dataset.term===termFilter));
+}
+document.querySelectorAll("button.f[data-make]").forEach(b=>
+  b.addEventListener("click",()=>{ makeFilter=b.dataset.make; syncActive(); render(); }));
+document.querySelectorAll("button.f[data-term]").forEach(b=>
+  b.addEventListener("click",()=>{ termFilter=b.dataset.term; syncActive(); render(); }));
+syncActive();
 render();
 </script>
 </body>
