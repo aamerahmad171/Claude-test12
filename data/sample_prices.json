@@ -1,18 +1,18 @@
 {
-  "_comment": "Illustrative, hand-seeded current selling prices. NOT live CarGurus data. vehicle_id is '<year> <make> <model> <trim>'. Replace via a compliant CarGurus-derived source (see leasefinder/sources/cargurus.py).",
+  "_comment": "Illustrative, hand-seeded current selling prices. NOT live CarGurus data. vehicle_id is '<year> <make> <model> <trim>'. The 'vin' values are obviously-synthetic placeholders (prefix SAMPLEVIN) to demonstrate the VIN column — they are NOT real vehicles. Replace via a compliant CarGurus/Marketcheck-derived source or a maintained quote file with real VINs.",
   "prices": [
-    {"vehicle_id": "2025 Honda Civic Sport", "selling_price": 26200, "dealer": "Metro Honda", "location": "07030", "url": "https://example.com/listing/1"},
-    {"vehicle_id": "2025 Honda Civic Sport", "selling_price": 26800, "dealer": "Hudson Honda", "location": "07087", "url": "https://example.com/listing/2"},
-    {"vehicle_id": "2025 Honda CR-V EX", "selling_price": 32600, "dealer": "Metro Honda", "location": "07030", "url": "https://example.com/listing/3"},
-    {"vehicle_id": "2025 Honda CR-V EX", "selling_price": 33100, "dealer": "Paramus Honda", "location": "07652", "url": "https://example.com/listing/4"},
-    {"vehicle_id": "2025 Toyota RAV4 XLE", "selling_price": 33200, "dealer": "City Toyota", "location": "10001", "url": "https://example.com/listing/5"},
-    {"vehicle_id": "2025 Toyota Camry SE", "selling_price": 28400, "dealer": "City Toyota", "location": "10001", "url": "https://example.com/listing/6"},
-    {"vehicle_id": "2025 Tesla Model 3 RWD", "selling_price": 42990, "dealer": "Tesla (no discount)", "location": "10001", "url": "https://example.com/listing/7"},
-    {"vehicle_id": "2025 BMW 330i xDrive", "selling_price": 44100, "dealer": "Park Ave BMW", "location": "07645", "url": "https://example.com/listing/8"},
-    {"vehicle_id": "2025 BMW 330i xDrive", "selling_price": 44950, "dealer": "BMW of Manhattan", "location": "10019", "url": "https://example.com/listing/9"},
-    {"vehicle_id": "2025 Hyundai Tucson SEL", "selling_price": 29800, "dealer": "Liberty Hyundai", "location": "07601", "url": "https://example.com/listing/10"},
-    {"vehicle_id": "2025 Chevrolet Equinox EV LT", "selling_price": 41500, "dealer": "Downtown Chevy", "location": "10013", "url": "https://example.com/listing/11"},
-    {"vehicle_id": "2025 Ford F-150 XLT", "selling_price": 45900, "dealer": "Town Ford", "location": "07666", "url": "https://example.com/listing/12"},
-    {"vehicle_id": "2025 Subaru Outback Premium", "selling_price": 31300, "dealer": "All-Wheel Subaru", "location": "07446", "url": "https://example.com/listing/13"}
+    {"vehicle_id": "2025 Honda Civic Sport", "selling_price": 26200, "dealer": "Metro Honda", "location": "07030", "url": "https://example.com/listing/1", "vin": "SAMPLEVIN00000001"},
+    {"vehicle_id": "2025 Honda Civic Sport", "selling_price": 26800, "dealer": "Hudson Honda", "location": "07087", "url": "https://example.com/listing/2", "vin": "SAMPLEVIN00000002"},
+    {"vehicle_id": "2025 Honda CR-V EX", "selling_price": 32600, "dealer": "Metro Honda", "location": "07030", "url": "https://example.com/listing/3", "vin": "SAMPLEVIN00000003"},
+    {"vehicle_id": "2025 Honda CR-V EX", "selling_price": 33100, "dealer": "Paramus Honda", "location": "07652", "url": "https://example.com/listing/4", "vin": "SAMPLEVIN00000004"},
+    {"vehicle_id": "2025 Toyota RAV4 XLE", "selling_price": 33200, "dealer": "City Toyota", "location": "10001", "url": "https://example.com/listing/5", "vin": "SAMPLEVIN00000005"},
+    {"vehicle_id": "2025 Toyota Camry SE", "selling_price": 28400, "dealer": "City Toyota", "location": "10001", "url": "https://example.com/listing/6", "vin": "SAMPLEVIN00000006"},
+    {"vehicle_id": "2025 Tesla Model 3 RWD", "selling_price": 42990, "dealer": "Tesla (no discount)", "location": "10001", "url": "https://example.com/listing/7", "vin": "SAMPLEVIN00000007"},
+    {"vehicle_id": "2025 BMW 330i xDrive", "selling_price": 44100, "dealer": "Park Ave BMW", "location": "07645", "url": "https://example.com/listing/8", "vin": "SAMPLEVIN00000008"},
+    {"vehicle_id": "2025 BMW 330i xDrive", "selling_price": 44950, "dealer": "BMW of Manhattan", "location": "10019", "url": "https://example.com/listing/9", "vin": "SAMPLEVIN00000009"},
+    {"vehicle_id": "2025 Hyundai Tucson SEL", "selling_price": 29800, "dealer": "Liberty Hyundai", "location": "07601", "url": "https://example.com/listing/10", "vin": "SAMPLEVIN00000010"},
+    {"vehicle_id": "2025 Chevrolet Equinox EV LT", "selling_price": 41500, "dealer": "Downtown Chevy", "location": "10013", "url": "https://example.com/listing/11", "vin": "SAMPLEVIN00000011"},
+    {"vehicle_id": "2025 Ford F-150 XLT", "selling_price": 45900, "dealer": "Town Ford", "location": "07666", "url": "https://example.com/listing/12", "vin": "SAMPLEVIN00000012"},
+    {"vehicle_id": "2025 Subaru Outback Premium", "selling_price": 31300, "dealer": "All-Wheel Subaru", "location": "07446", "url": "https://example.com/listing/13", "vin": "SAMPLEVIN00000013"}
   ]
 }

@@ -87,6 +87,7 @@
         <tr>
           <th class="l">#</th>
           <th class="l">Vehicle</th>
+          <th class="l">VIN</th>
           <th class="l">Body</th>
           <th>MSRP</th>
           <th>Price</th>
@@ -105,6 +106,7 @@
         <tr>
           <td class="l">{{ loop.index }}</td>
           <td class="l">{{ d.vehicle }}<br><span class="pill">{{ d.price.dealer }}</span></td>
+          <td class="l">{{ d.price.vin or "—" }}</td>
           <td class="l">{{ d.vehicle.body_style }}</td>
           <td>${{ "{:,.0f}".format(d.vehicle.msrp) }}</td>
           <td>${{ "{:,.0f}".format(d.price.selling_price) }}</td>

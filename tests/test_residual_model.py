@@ -86,3 +86,24 @@ def test_estimated_price_below_msrp():
         quote = prices.best_price_for(v)
         assert quote is not None
         assert 0 < quote.selling_price < v.msrp
+
+
+def test_catalog_includes_gm_brands():
+    makes = {v.make for v in EstimatedResidualSource().vehicles()}
+    assert {"Chevrolet", "GMC", "Buick", "Cadillac"} <= makes
+
+
+def test_estimated_price_has_no_vin():
+    # Modeled archetypes are not specific physical cars, so no VIN.
+    prices = EstimatedPriceSource()
+    v = EstimatedResidualSource().vehicles()[0]
+    assert prices.best_price_for(v).vin == ""
+
+
+def test_sample_prices_carry_vin():
+    from leasefinder.sources.sample import SamplePriceSource, SampleResidualSource
+
+    res = SampleResidualSource()
+    prices = SamplePriceSource()
+    seen = [q.vin for v in res.vehicles() for q in prices.prices_for(v)]
+    assert any(vin for vin in seen)  # at least some VINs populated

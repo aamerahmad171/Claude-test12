@@ -51,7 +51,12 @@ class LeaseProgram:
 
 @dataclass(frozen=True)
 class PriceQuote:
-    """A current selling price for a vehicle — the CarGurus-style input."""
+    """A current selling price for a vehicle — the CarGurus-style input.
+
+    A ``vin`` identifies one *specific physical car* on a lot, so it is only
+    known for real-inventory sources (Marketcheck, a maintained quote file).
+    Modeled/archetype rows leave it blank.
+    """
 
     vehicle_id: str
     selling_price: float
@@ -59,6 +64,7 @@ class PriceQuote:
     location: str = ""
     source: str = "unknown"   # provenance, e.g. "cargurus", "sample"
     url: str = ""
+    vin: str = ""
 
 
 @dataclass

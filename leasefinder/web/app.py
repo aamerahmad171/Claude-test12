@@ -70,6 +70,7 @@ def _deal_to_dict(deal: LeaseDeal) -> dict:
     return {
         "vehicle": deal.vehicle.vehicle_id,
         "body_style": deal.vehicle.body_style,
+        "vin": deal.price.vin,
         "msrp": deal.vehicle.msrp,
         "selling_price": deal.price.selling_price,
         "dealer": deal.price.dealer,

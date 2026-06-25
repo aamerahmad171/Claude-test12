@@ -79,6 +79,7 @@ class SamplePriceSource(PriceSource):
                 location=entry.get("location", ""),
                 source="sample",
                 url=entry.get("url", ""),
+                vin=entry.get("vin", ""),
             )
             self._prices.setdefault(quote.vehicle_id, []).append(quote)
 

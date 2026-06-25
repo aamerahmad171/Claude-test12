@@ -92,6 +92,7 @@ class MarketcheckPriceSource(PriceSource):
                     location=dealer.get("city", ""),
                     source="marketcheck",
                     url=listing.get("vdp_url", ""),
+                    vin=listing.get("vin", ""),
                 )
             )
         return quotes

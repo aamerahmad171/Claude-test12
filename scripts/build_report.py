@@ -42,6 +42,7 @@ def _deal_rows() -> list[dict]:
                 "vehicle": d.vehicle.vehicle_id,
                 "make": d.vehicle.make,
                 "body": d.vehicle.body_style,
+                "vin": d.price.vin,
                 "dealer": d.price.dealer,
                 "msrp": d.vehicle.msrp,
                 "price": d.price.selling_price,
@@ -71,6 +72,7 @@ def _rows_html(rows: list[dict]) -> str:
             f'<tr>'
             f'<td class="l rank">{i}</td>'
             f'<td class="l">{r["vehicle"]}<br><span class="pill">{r["dealer"]}</span></td>'
+            f'<td class="l vin">{r["vin"] or "—"}</td>'
             f'<td class="l">{r["body"]}</td>'
             f'<td>{_money(r["msrp"])}</td>'
             f'<td>{_money(r["price"])}</td>'
@@ -130,6 +132,7 @@ tbody tr:hover{background:#1e2230;}
 .pill{font-size:11px;color:var(--muted);border:1px solid var(--line);padding:1px 7px;border-radius:999px;}
 .good1{color:var(--good);font-weight:600;}
 .rank{color:var(--muted);}
+.vin{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:var(--muted);letter-spacing:.02em;}
 .controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:14px;}
 .controls .lbl{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.03em;margin-left:6px;}
 .controls .lbl:first-child{margin-left:0;}
@@ -150,7 +153,10 @@ a{color:#7fb6ff;}
     published depreciation patterns (term, segment, mileage), and prices are estimated from MSRP —
     no Leasehackr / CarGurus feed (neither offers a public API). The lease math is exact; the inputs
     are transparent estimates, not a specific manufacturer's program. Drop in a maintained data file
-    or a Marketcheck key for real prices. Generated <strong>__GENERATED__</strong>.
+    or a Marketcheck key for real prices. <strong>VIN</strong> shows a dash (—) here because these are
+    modeled <em>archetypes</em> (a "2025 Silverado LT", not a specific car) — a VIN identifies one
+    physical vehicle, so it only appears when the list is fed by real inventory (Marketcheck or a
+    maintained quote file). Generated <strong>__GENERATED__</strong>.
   </div>
 </header>
 <div class="wrap">
@@ -170,6 +176,7 @@ a{color:#7fb6ff;}
       <tr>
         <th class="l" data-k="rank">#</th>
         <th class="l" data-k="vehicle">Vehicle</th>
+        <th class="l" data-k="vin">VIN</th>
         <th class="l" data-k="body">Body</th>
         <th data-k="msrp">MSRP</th>
         <th data-k="price">Price</th>
@@ -210,11 +217,12 @@ function render(){
   const cnt = document.getElementById("count");
   if(cnt) cnt.textContent = `${rows.length} of ${DATA.length} deals`;
   const tb = document.getElementById("b");
-  if(!rows.length){ tb.innerHTML = '<tr><td class="l" colspan="13">No deals match these filters.</td></tr>'; return; }
+  if(!rows.length){ tb.innerHTML = '<tr><td class="l" colspan="14">No deals match these filters.</td></tr>'; return; }
   tb.innerHTML = rows.map((r,i)=>`
     <tr>
       <td class="l rank">${i+1}</td>
       <td class="l">${r.vehicle}<br><span class="pill">${r.dealer}</span></td>
+      <td class="l vin">${r.vin || "—"}</td>
       <td class="l">${r.body}</td>
       <td>${money(r.msrp)}</td>
       <td>${money(r.price)}</td>
