@@ -63,6 +63,22 @@ pytest
 
 ---
 
+## Hosted results page
+
+A static, self-contained results page is generated from the data:
+
+```bash
+python scripts/build_report.py   # writes docs/index.html
+```
+
+- It works with **no server** — open `docs/index.html` directly, or host it.
+- The table is rendered at build time (so it shows even with JavaScript off);
+  clicking a column header re-sorts it when JS is available.
+- A GitHub Actions workflow (`.github/workflows/pages.yml`) rebuilds and
+  publishes it to **GitHub Pages** on merge to `main`. One-time setup:
+  *Settings → Pages → Source: GitHub Actions*. The site then lives at
+  `https://<owner>.github.io/<repo>/`.
+
 ## How a deal is scored
 
 For each candidate (a vehicle + a lease program + a price quote) the engine
