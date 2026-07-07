@@ -73,6 +73,16 @@ python -m leasefinder.cli --residuals sample --prices sample
 python -m leasefinder.web.app
 ```
 
+### Standalone lease calculator
+
+If you already have your own numbers (MSRP, selling price, residual %, money
+factor, total incentives) and just want the Leasehackr-style breakdown — no
+data sources, no ranking — open **`/calculator`** in the web UI
+(`http://localhost:5000/calculator`). Every field updates the result live via
+`/api/calculate`, which is a thin JSON wrapper around the same
+[`compute_lease`](leasefinder/lease_math.py) function described below, so the
+numbers are identical to (and tested against) the CLI and deals finder.
+
 Run the tests:
 
 ```bash

@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lease Calculator</title>
+  <style>
+    :root { --bg:#0f1115; --card:#181b22; --line:#262b35; --txt:#e6e9ef; --muted:#8b93a3; --good:#4ad295; --bad:#e2607a; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--txt); font:15px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+    header { padding:28px 24px 8px; }
+    h1 { margin:0; font-size:24px; }
+    .sub { color:var(--muted); margin-top:4px; max-width:760px; }
+    a { color:#7fb6ff; }
+    .layout { display:flex; flex-wrap:wrap; gap:20px; padding:16px 24px 40px; align-items:flex-start; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 20px; }
+    .inputs { flex: 1 1 420px; min-width:320px; }
+    .results { flex: 1 1 380px; min-width:300px; position:sticky; top:16px; }
+    fieldset { border:1px solid var(--line); border-radius:8px; margin:0 0 16px; padding:12px 14px 16px; }
+    legend { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.03em; padding:0 6px; }
+    .row { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:10px; }
+    .field { display:flex; flex-direction:column; gap:4px; flex:1 1 150px; }
+    label { font-size:12px; color:var(--muted); }
+    input[type=number], input[type=text] { background:#11141b; border:1px solid var(--line); color:var(--txt); padding:8px 9px; border-radius:7px; font-size:14px; width:100%; }
+    .toggle-row { display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted); }
+    .toggle-row input { accent-color: var(--good); }
+    table.results-table { width:100%; border-collapse:collapse; }
+    table.results-table td { padding:6px 4px; border-bottom:1px solid var(--line); font-size:14px; }
+    table.results-table td.label { color:var(--muted); }
+    table.results-table td.value { text-align:right; font-variant-numeric:tabular-nums; }
+    .headline { display:flex; justify-content:space-between; align-items:baseline; padding:6px 4px 14px; }
+    .headline .amt { font-size:32px; font-weight:700; color:var(--good); }
+    .headline .cap { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+    .section-title { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.03em; margin:16px 0 4px; }
+    .pill { display:inline-block; font-size:11px; border:1px solid var(--line); border-radius:999px; padding:1px 8px; margin-left:6px; }
+    .good { color:var(--good); }
+    .bad { color:var(--bad); }
+    .error { color:var(--bad); font-size:13px; padding:8px 0; display:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🧮 Lease Calculator</h1>
+    <div class="sub">
+      Enter the numbers off your build sheet and quote sheet &mdash; MSRP, selling price, residual %,
+      money factor, and total incentives &mdash; the same inputs the Leasehackr calculator uses.
+      Everything below updates live and is computed by the same depreciation + rent-charge formula
+      covered by this project's tests. Looking to browse ranked deals instead? Go to the
+      <a href="/">deals finder</a>.
+    </div>
+  </header>
+
+  <div class="layout">
+    <form class="card inputs" id="calc-form" autocomplete="off">
+      <fieldset>
+        <legend>Vehicle</legend>
+        <div class="row">
+          <div class="field">
+            <label>MSRP ($)</label>
+            <input type="number" name="msrp" id="msrp" value="45000" step="0.01" min="0" required />
+          </div>
+          <div class="field">
+            <label>Selling price ($)</label>
+            <input type="number" name="selling_price" id="selling_price" value="42000" step="0.01" min="0" required />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Lease program</legend>
+        <div class="row">
+          <div class="field">
+            <label>Residual (% of MSRP)</label>
+            <input type="number" name="residual_percent_pct" id="residual_percent_pct" value="58" step="0.01" min="0" max="100" required />
+          </div>
+          <div class="field">
+            <label>Term (months)</label>
+            <input type="number" name="term" id="term" value="36" step="1" min="1" required />
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label id="rate-label">Money factor</label>
+            <input type="number" name="rate" id="rate" value="0.00125" step="0.00001" min="0" required />
+          </div>
+          <div class="field" style="justify-content:flex-end;">
+            <div class="toggle-row">
+              <input type="checkbox" id="use-apr" />
+              <label for="use-apr" style="font-size:12.5px;">enter as APR % instead (APR = MF &times; 2400)</label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Incentives &amp; cash</legend>
+        <div class="row">
+          <div class="field">
+            <label>Total incentives / lease cash ($)</label>
+            <input type="number" name="incentives" id="incentives" value="0" step="0.01" min="0" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>Cash down ($)</label>
+            <input type="number" name="down_payment" id="down_payment" value="0" step="0.01" min="0" />
+          </div>
+          <div class="field">
+            <label>Trade-in equity ($)</label>
+            <input type="number" name="trade_in" id="trade_in" value="0" step="0.01" min="0" />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Fees &amp; tax</legend>
+        <div class="row">
+          <div class="field">
+            <label>Acquisition fee (capitalized, $)</label>
+            <input type="number" name="acquisition_fee" id="acquisition_fee" value="895" step="0.01" min="0" />
+          </div>
+          <div class="field">
+            <label>Other upfront fees ($)</label>
+            <input type="number" name="upfront_fees" id="upfront_fees" value="0" step="0.01" min="0" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>Sales tax rate (%)</label>
+            <input type="number" name="tax_rate_pct" id="tax_rate_pct" value="0" step="0.001" min="0" />
+          </div>
+          <div class="field" style="justify-content:flex-end;">
+            <div class="toggle-row">
+              <input type="checkbox" id="first-payment" checked />
+              <label for="first-payment">first month's payment due at signing</label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="error" id="error"></div>
+    </form>
+
+    <div class="card results">
+      <div class="headline">
+        <div>
+          <div class="cap">Monthly payment</div>
+          <div class="amt" id="out-monthly">$0</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="cap">1% rule</div>
+          <div id="out-onepercent" style="font-size:20px; font-weight:600;">0.00%</div>
+        </div>
+      </div>
+
+      <table class="results-table">
+        <tr><td class="label">Residual value</td><td class="value" id="out-residual-value">$0</td></tr>
+        <tr><td class="label">Adjusted cap cost</td><td class="value" id="out-cap-cost">$0</td></tr>
+        <tr><td class="label">Monthly depreciation</td><td class="value" id="out-depreciation">$0</td></tr>
+        <tr><td class="label">Monthly rent charge</td><td class="value" id="out-rent-charge">$0</td></tr>
+        <tr><td class="label">Base payment (pre-tax)</td><td class="value" id="out-base">$0</td></tr>
+        <tr><td class="label">Monthly tax</td><td class="value" id="out-tax">$0</td></tr>
+        <tr><td class="label">APR (equivalent)</td><td class="value" id="out-apr">0.00%</td></tr>
+      </table>
+
+      <div class="section-title">Due at signing</div>
+      <table class="results-table">
+        <tr><td class="label">Cash down</td><td class="value" id="out-das-down">$0</td></tr>
+        <tr><td class="label">Trade-in equity</td><td class="value" id="out-das-trade">$0</td></tr>
+        <tr><td class="label">Other upfront fees</td><td class="value" id="out-das-fees">$0</td></tr>
+        <tr><td class="label">First month's payment</td><td class="value" id="out-das-first">$0</td></tr>
+        <tr><td class="label"><strong>Total due at signing</strong></td><td class="value" id="out-das-total"><strong>$0</strong></td></tr>
+      </table>
+
+      <div class="section-title">Over the full lease</div>
+      <table class="results-table">
+        <tr><td class="label">Total of all monthly payments</td><td class="value" id="out-total-payments">$0</td></tr>
+        <tr><td class="label">Total lease cost (incl. due at signing)</td><td class="value" id="out-total-cost">$0</td></tr>
+        <tr><td class="label"><strong>Effective monthly cost</strong><span class="pill">apples-to-apples</span></td><td class="value" id="out-effective"><strong>$0</strong></td></tr>
+        <tr><td class="label">Effective 1% rule</td><td class="value" id="out-eff-onepercent">0.00%</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('calc-form');
+    const errorBox = document.getElementById('error');
+    const useApr = document.getElementById('use-apr');
+    const rateInput = document.getElementById('rate');
+    const rateLabel = document.getElementById('rate-label');
+
+    function fmtMoney(n) {
+      const v = Number(n) || 0;
+      const sign = v < 0 ? '-' : '';
+      return sign + '$' + Math.abs(v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+    function fmtPct(n) {
+      return (Number(n) || 0).toFixed(2) + '%';
+    }
+
+    useApr.addEventListener('change', () => {
+      if (useApr.checked) {
+        rateLabel.textContent = 'APR (%)';
+        rateInput.step = '0.01';
+        rateInput.value = (parseFloat(rateInput.value || 0) * 2400).toFixed(2);
+      } else {
+        rateLabel.textContent = 'Money factor';
+        rateInput.step = '0.00001';
+        rateInput.value = (parseFloat(rateInput.value || 0) / 2400).toFixed(5);
+      }
+      recalc();
+    });
+
+    function buildParams() {
+      const params = new URLSearchParams();
+      params.set('msrp', document.getElementById('msrp').value || 0);
+      params.set('selling_price', document.getElementById('selling_price').value || 0);
+      params.set('term', document.getElementById('term').value || 0);
+      params.set('residual_percent', (parseFloat(document.getElementById('residual_percent_pct').value || 0) / 100));
+      const rate = parseFloat(rateInput.value || 0);
+      if (useApr.checked) {
+        params.set('apr', rate);
+      } else {
+        params.set('money_factor', rate);
+      }
+      params.set('incentives', document.getElementById('incentives').value || 0);
+      params.set('down_payment', document.getElementById('down_payment').value || 0);
+      params.set('trade_in', document.getElementById('trade_in').value || 0);
+      params.set('acquisition_fee', document.getElementById('acquisition_fee').value || 0);
+      params.set('upfront_fees', document.getElementById('upfront_fees').value || 0);
+      params.set('tax_rate', (parseFloat(document.getElementById('tax_rate_pct').value || 0) / 100));
+      params.set('first_payment_at_signing', document.getElementById('first-payment').checked ? 'true' : 'false');
+      return params;
+    }
+
+    let debounceTimer = null;
+    function scheduleRecalc() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(recalc, 150);
+    }
+
+    async function recalc() {
+      const params = buildParams();
+      let resp, data;
+      try {
+        resp = await fetch('/api/calculate?' + params.toString());
+        data = await resp.json();
+      } catch (e) {
+        errorBox.textContent = 'Could not reach the calculator API.';
+        errorBox.style.display = 'block';
+        return;
+      }
+      if (!resp.ok) {
+        errorBox.textContent = data.error || 'Invalid inputs.';
+        errorBox.style.display = 'block';
+        return;
+      }
+      errorBox.style.display = 'none';
+
+      document.getElementById('out-monthly').textContent = fmtMoney(data.monthly_payment);
+      document.getElementById('out-onepercent').textContent = fmtPct(data.one_percent);
+      document.getElementById('out-onepercent').className = data.one_percent <= 1.0 ? 'good' : '';
+
+      document.getElementById('out-residual-value').textContent = fmtMoney(data.residual_value);
+      document.getElementById('out-cap-cost').textContent = fmtMoney(data.adjusted_cap_cost);
+      document.getElementById('out-depreciation').textContent = fmtMoney(data.monthly_depreciation);
+      document.getElementById('out-rent-charge').textContent = fmtMoney(data.monthly_rent_charge);
+      document.getElementById('out-base').textContent = fmtMoney(data.base_payment);
+      document.getElementById('out-tax').textContent = fmtMoney(data.monthly_tax);
+      document.getElementById('out-apr').textContent = fmtPct(data.apr);
+
+      const das = data.due_at_signing_breakdown;
+      document.getElementById('out-das-down').textContent = fmtMoney(das.down_payment);
+      document.getElementById('out-das-trade').textContent = fmtMoney(das.trade_in);
+      document.getElementById('out-das-fees').textContent = fmtMoney(das.upfront_fees);
+      document.getElementById('out-das-first').textContent = fmtMoney(das.first_month_payment);
+      document.getElementById('out-das-total').textContent = fmtMoney(data.due_at_signing);
+
+      document.getElementById('out-total-payments').textContent = fmtMoney(data.monthly_payment * data.term);
+      document.getElementById('out-total-cost').textContent = fmtMoney(data.total_cost);
+      document.getElementById('out-effective').textContent = fmtMoney(data.effective_monthly);
+      document.getElementById('out-eff-onepercent').textContent = fmtPct(data.effective_one_percent);
+    }
+
+    form.addEventListener('input', scheduleRecalc);
+    recalc();
+  </script>
+</body>
+</html>
